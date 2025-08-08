@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Scholarship Finder</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS to import the Inter font and set a background color */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6 sm:p-8 space-y-8">
+        <!-- Header Section -->
+        <header class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">CS Scholarship Finder</h1>
+            <p class="mt-2 text-lg text-gray-600">Find and save the perfect scholarship to fund your computer science degree!</p>
+            <!-- Buttons for managing scholarships -->
+            <div class="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <div class="flex gap-2">
+                    <button id="view-favorites-btn" class="px-4 py-2 bg-yellow-400 text-white font-medium rounded-full shadow-md hover:bg-yellow-500 transition-colors hidden">
+                        View Saved Scholarships
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div id="app-content" class="relative">
+            <!-- Search Form Page -->
+            <section id="search-page" class="space-y-6">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <form id="scholarship-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                            <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                            <select id="state" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md"></select>
+                        </div>
+                        <div>
+                            <label for="race" class="block text-sm font-medium text-gray-700 mb-1">Race/Ethnicity</label>
+                            <select id="race" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="Any">Any</option>
+                                <option value="African American">African American</option>
+                                <option value="Hispanic/Latino">Hispanic/Latino</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Native American">Native American</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                            <select id="gender" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="Any">Any</option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Non-binary">Non-binary</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="grade" class="block text-sm font-medium text-gray-700 mb-1">Grade Level</label>
+                            <select id="grade" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="Any">Any</option>
+                                <option value="High School Freshman">9th Grade</option>
+                                <option value="High School Sophomore">10th Grade</option>
+                                <option value="High School Junior">11th Grade</option>
+                                <option value="High School Senior">12th Grade</option>
+                            </select>
+                        </div>
+                        <!-- Sort By dropdown -->
+                        <div class="md:col-span-2 lg:col-span-4 mt-4">
+                            <label for="sort-by-select" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                            <select id="sort-by-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md">
+                                <option value="default">Default</option>
+                                <option value="deadline">Deadline</option>
+                                <option value="amount">Amount (High to Low)</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="mt-6 text-center">
+                        <button id="search-button" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors">
+                            Find Scholarships
+                        </button>
+                    </div>
+                </div>
+            </section>
+       
+            <!-- Results Page -->
+            <section id="results-page" class="hidden">
+                <button id="back-to-search-btn" class="mb-4 text-sky-500 hover:text-sky-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Back to Search
+                </button>
+                <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Scholarship Results</h2>
+                <div id="scholarship-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <p id="loading-message" class="col-span-full text-center text-gray-500 italic">Loading scholarships...</p>
+                    <p id="no-results" class="col-span-full text-center text-gray-500 italic hidden">No scholarships found matching your criteria. Try adjusting your search filters.</p>
+                </div>
+                <div id="results-pagination-controls" class="flex justify-center items-center mt-6 space-x-2"></div>
+            </section>
+
+            <!-- Favorites Page -->
+            <section id="favorites-page" class="hidden">
+                <button id="back-from-favorites-btn" class="mb-4 text-sky-500 hover:text-sky-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Back to Search
+                </button>
+                <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Saved Scholarships</h2>
+                <div id="favorites-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <p id="no-favorites" class="col-span-full text-center text-gray-500 italic hidden">You haven't saved any scholarships yet.</p>
+                </div>
+                <div id="favorites-pagination-controls" class="flex justify-center items-center mt-6 space-x-2"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- The JavaScript code that provides the app's functionality -->
+    <script>
+        // Use a single variable to store all the scholarships
+        let allScholarships = [];
+        let favoriteIds = new Set();
+       
+        // Pagination state variables
+        let resultsCurrentPage = 1;
+        let favoritesCurrentPage = 1;
+        const itemsPerPage = 10;
+        let currentFilteredResults = [];
+        let currentFavoriteResults = [];
+       
+        // Pre-populated scholarships without explicit IDs
+        const prepopulatedScholarships = [
+             {
+           
+                name: "Chris Jackson Computer Science Education Scholarship",
+                description: "This memorial fund for Chris Jackson will support students who want to pursue a Computer Science degree to make the world a better place.",
+                applicationLink: "https://www.honorsociety.org/scholarships/chris-jackson-computer-science-education-scholarship",
+                amount: "$5,000",
+                deadline: "October 14, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Brandon Repola Memorial Scholarship",
+                description: "This scholarship seeks to honor the legacy of Brandon Repola by supporting students with big goals who are interested in video and digital marketing.",
+                applicationLink: "https://bold.org/funds/brandon-repola-memorial-scholarship-fund/",
+                amount: "$715",
+                deadline: "October 27, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Kyle Lam Hacker Scholarship",
+                description: "This scholarship seeks to honor the memory of Kyle Lam by supporting students at his alma mater who exemplify the curiosity, experimentation, and execution that Kyle lived by.",
+                applicationLink: "https://bold.org/scholarships/kyle-lam-hacker-scholarship/",
+                amount: "$5,000",
+                deadline: "November 15, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Bushnell Bioinformatic Scholarship",
+                description: "This scholarship aims to help future scientists build the bioinformatic skills required to evaluate large sets of biological data.",
+                applicationLink: "https://bold.org/scholarships/bushnell-bioinformatic-scholarship/",
+                amount: "$500",
+                deadline: "December 01, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Solomon Vann Memorial Scholarship",
+                description: "This scholarship seeks to honor the memory of Solomon Vann by supporting students in Alabama who have encountered mental illness.",
+                applicationLink: "https://bold.org/scholarships/solomon-vann-memorial-scholarship/",
+                amount: "$2,000",
+                deadline: "October 18, 2026",
+                eligibility: {
+                  state: "Alabama",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Jack “Fluxare” Hytner Memorial Scholarship",
+                description: "This scholarship exists to support a passionate high school senior or undergraduate student who plans to study computer science or video game design and production.",
+                applicationLink: "https://bold.org/scholarships/jack-hytner-memorial-scholarship/",
+                amount: "$1,000",
+                deadline: "April 01, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Pablo M. Ortiz Memorial Scholarship",
+                description: "This scholarship seeks to honor Pablo M. Ortiz’s legacy by supporting underrepresented students who are interested in software engineering or computer science.",
+                applicationLink: "https://bold.org/scholarships/pablo-m-ortiz-memorial-scholarship/",
+                amount: "$1,000",
+                deadline: "November 15, 2024",
+                eligibility: {
+                  state: "Any",
+                  race: "BIPOC",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "StatusGator Women in Tech Scholarship",
+                description: "This scholarship seeks to remove the barriers that remain in the tech industry by supporting gender equity.",
+                applicationLink: "https://statusgator.com/blog/announcing-the-statusgator-women-in-tech-scholarship/",
+                amount: "$3,100",
+                deadline: "July 13, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Minority Students x Stem Scholarship",
+                description: "This scholarship seeks to help underserved students find success as they pursue careers in the technology field.",
+                applicationLink: "https://bold.org/scholarships/minority-students-x-stem-scholarship/",
+                amount: "$10,800",
+                deadline: "April 15, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "BIPOC",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "codePost Computer Science Education Scholarship",
+                description: "The codePost Computer Science Scholarship recognizes and encourages students who advance CS education within their school and in their communities.",
+                applicationLink: "https://codepost.io/scholarships/computer-science-education",
+                amount: "$500",
+                deadline: "July 01, 2020",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Any"]
+                }
+              },
+              {
+                name: "Faith and Tech Scholarship",
+                description: "This scholarship exists to encourage Christian students who love computer science to continue their studies toward a brighter future for themselves and their community.",
+                applicationLink: "https://bold.org/scholarships/faith-and-tech-scholarship/",
+                amount: "$500",
+                deadline: "October 10, 2021",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Any"]
+                }
+              },
+              {
+                name: "Ohio Information Technology Scholarship",
+                description: "This scholarship seeks to support high school seniors in Ohio or Pennsylvania who are interested in studying information technology.",
+                applicationLink: "https://bold.org/scholarships/ohio-information-technology-scholarship/#:~:text=This%20scholarship%20seeks%20to%20support,a%20related%20field%20may%20apply.",
+                amount: "$1,500",
+                deadline: "February 27, 2022",
+                eligibility: {
+                  state: ["Ohio", "Pennsylvania"],
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Bold Technology Matters Scholarship",
+                description: "This scholarship will help one ambitious student harness their full potential as a tech professional to change the world for the better.",
+                applicationLink: "https://bold.org/scholarships/bold-technology-matters-scholarship/",
+                amount: "$500",
+                deadline: "April 22, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Any"]
+                }
+              },
+              {
+                name: "Gulo Marketing Website Design Scholarship",
+                description: "This scholarship will support one website design/development major.",
+                applicationLink: "https://gulosolutions.com/website-design-scholarship-college-students/",
+                amount: "$1,000",
+                deadline: "June 11, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Interdisciplinary Technology Scholarship",
+                description: "This scholarship seeks to support the future generation of well-rounded technological leaders who are interested in multiple fields.",
+                applicationLink: "https://newpaltz.academicworks.com/opportunities/7161",
+                amount: "$5,000",
+                deadline: "June 15, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Coding for Minorities Scholarship",
+                description: "The Coding for Minorities Scholarship will be awarded to one determined minority student pursuing a degree/career in coding or computer science.",
+                applicationLink: "https://bold.org/scholarships/coding-for-minorities-scholarship/#:~:text=To%20support%20the%20endeavors%20of,in%20coding%20or%20computer%20science.",
+                amount: "$500",
+                deadline: "July 01, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: "Any",
+                  grade: ["Any"]
+                }
+              },
+              {
+                name: "Taking Up Space Scholarship",
+                description: "This scholarship seeks to empower and encourage women who are pursuing careers in male-dominated fields and paving the way for the next generation of women.",
+                applicationLink: "https://bold.org/scholarships/taking-up-space-scholarship/",
+                amount: "$500",
+                deadline: "July 01, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: "Female",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Roger Boston Scholarship",
+                description: "This scholarship will support community college students pursuing a degree in astronomy and computer science.",
+                applicationLink: "https://bold.org/scholarships/roger-boston-scholarship/",
+                amount: "$1,000",
+                deadline: "October 01, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Jada Martin Scholarship",
+                description: "This scholarship will support a female high school student who is planning to study computer science.",
+                applicationLink: "https://ndsu.academicworks.com/opportunities/33005",
+                amount: "$1,000",
+                deadline: "December 01, 2022",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Junior", "High School Senior"]
+                }
+              },
+              {
+                name: "Future Leaders in Technology Scholarship - High School Award",
+                description: "The Future Leaders in Technology Scholarship will support two high school students as a way to bridge the gap between opportunity and access in the tech industry.",
+                applicationLink: "https://bold.org/scholarships/future-leaders-in-technology-high-school-award/",
+                amount: "$2,000",
+                deadline: "January 16, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Freshman", "High School Sophomore", "High School Junior", "High School Senior"]
+                }
+              },
+              {
+                name: "Future Leaders in Technology Scholarship - College Award",
+                description: "The Future Leaders in Technology Scholarship will support one college student as a way to bridge the gap between opportunity and access in the tech industry.",
+                applicationLink: "https://bold.org/scholarships/future-leaders-in-technology-college-award/",
+                amount: "$2,500",
+                deadline: "January 16, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Scholar Dudes in Computer Science Scholarship",
+                description: "This scholarship seeks to support two undergraduate students pursuing a degree in computer science.",
+                applicationLink: "https://bold.org/scholarships/scholar-dudes-in-computer-science-scholarship/",
+                amount: "$1,000",
+                deadline: "February 20, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Abhi Khune Underrepresented Minorities Scholarship",
+                description: "This scholarship aims to support female African American undergraduate students pursuing degrees in STEM.",
+                applicationLink: "https://bold.org/scholarships/Abhi-Khune-underrepresented-minorities-scholarship/",
+                amount: "$10,000",
+                deadline: "March 01, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "African American",
+                  gender: "Female",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Elevate Women in Technology Scholarship",
+                description: "This scholarship will support a woman pursuing a career in technology.",
+                applicationLink: "https://bold.org/scholarships/elevate-women-in-technology-scholarship/",
+                amount: "$500",
+                deadline: "April 01, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Alex D. Sharpless II Memorial Scholarship",
+                description: "This scholarship aims to honor Alex D. Sharpless II and keep his memory alive by helping high school seniors attend college.",
+                applicationLink: "https://bold.org/scholarships/alex-d-sharpless-II-memorial-scholarship/",
+                amount: "$1,500",
+                deadline: "June 01, 2023",
+                eligibility: {
+                  state: "North Carolina",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "McDuffie Software Engineering Scholarship",
+                description: "This scholarship aims to encourage women to pursue their technological passions so they can find success in their careers and bring innovation to the field of software engineering.",
+                applicationLink: "https://bold.org/scholarships/mcduffie-software-engineering-scholarship/",
+                amount: "$2,000",
+                deadline: "July 15, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Revolutionizing Robotics and Computer Sciences Scholarship",
+                description: "The Revolutionizing Robotics and Computer Sciences Scholarship aims to support underrepresented students who are enthusiastic about exploring new possibilities in the field of robotics and automation.",
+                applicationLink: "https://bold.org/scholarships/revolutionizing-robotics-and-computer-sciences-scholarship/",
+                amount: "$4,500",
+                deadline: "November 20, 2023",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "William A. Stuart Dream Scholarship",
+                description: "This scholarship aims to honor the life of William A. Stuart by supporting students who share his passion for learning.",
+                applicationLink: "https://bold.org/scholarships/william-a-stuart-dream-scholarship/",
+                amount: "$2,000",
+                deadline: "March 30, 2024",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Bits and Bytes Scholarship",
+                description: "This scholarship aims to support students with financial need who are pursuing their dreams in the tech industry.",
+                applicationLink: "https://bold.org/scholarships/bits-and-bytes-scholarship/",
+                amount: "$500",
+                deadline: "August 15, 2024",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Heal Our World Software Scholarship",
+                description: "This scholarship will support students who believe in the power of using software to better improve society.",
+                applicationLink: "https://bold.org/scholarships/heal-our-world-software-scholarship/",
+                amount: "$500",
+                deadline: "August 17, 2024",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Excelsior Cyber Security Scholarship",
+                description: "This scholarship aims to award students who live by “excelsior”, which means to live with excellence, and to move “ever upward.”",
+                applicationLink: "https://bold.org/scholarships/excelsior-cyber-security-scholarship/",
+                amount: "$500",
+                deadline: "November 01, 2024",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Level Up Scholarship",
+                description: "This scholarship aims to support students who are avid gamers interested in pursuing fields related to art or programming.",
+                applicationLink: "https://bold.org/scholarships/level-up-scholarship/",
+                amount: "$2,000",
+                deadline: "February 23, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Ben Brock Memorial Scholarship",
+                description: "This scholarship aims to honor the life of Ben Brock by supporting lifelong learners who are veterans or the family members of veterans.",
+                applicationLink: "https://bold.org/scholarships/ben-brock-memorial-scholarship/",
+                amount: "$7,500",
+                deadline: "March 29, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Hackers Against Hate: Diversity in Information Security Scholarship",
+                description: "This scholarship aims to break down barriers and foster an inclusive information security community where merit and passion determine success.",
+                applicationLink: "https://bold.org/scholarships/hackers-against-hate-diversity-in-information-security-scholarship/",
+                amount: "$1,000",
+                deadline: "April 14, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Lyndsey Scott Coding+ Scholarship",
+                description: "This scholarship will support students who want to pursue futures in both computer science and their other passions outside of class work.",
+                applicationLink: "https://bold.org/scholarships/lyndsey-scott-coding-plus-scholarship/",
+                amount: "$12,000",
+                deadline: "April 15, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: ["Female", "Non-binary"],
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Chineye Emeghara’s Outside the Binary: Black Women in Tech Scholarship",
+                description: "This scholarship aims to support young women who are multifaceted in their interests and pursuits so they can achieve their goals.",
+                applicationLink: "https://bold.org/scholarships/chineye-emegharas-outside-the-binary-black-women-in-tech-scholarship/",
+                amount: "$1,000",
+                deadline: "May 30, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "African American",
+                  gender: "Female",
+                  grade: ["High School Freshman", "High School Sophomore", "High School Junior", "High School Senior"]
+                }
+              },
+           
+              {
+                name: "Empowering Black Women in Tech",
+                description: "This scholarship seeks to empower and support talented Black women who are passionate about technology and demonstrate a strong commitment to their academic pursuits.",
+                applicationLink: "https://bold.org/scholarships/empowering-black-women-in-tech/",
+                amount: "$3,000",
+                deadline: "May 31, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "African American",
+                  gender: "Female",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Arthur Walasek Computer Science Memorial Scholarship",
+                description: "This scholarship seeks to honor the life of Arthur Walasek by supporting students who are passionate about computer science.",
+                applicationLink: "https://bold.org/scholarships/arthur-walasek-computer-science-memorial-scholarship/",
+                amount: "$1,000",
+                deadline: "July 01, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Tony Alviani Memorial Scholarship",
+                description: "This scholarship will be awarded to a high school senior or current undergraduate student who plans to or is already pursuing a degree in business or computer science.",
+                applicationLink: "https://bold.org/scholarships/tony-alviani-memorial-scholarship/",
+                amount: "$500",
+                deadline: "July 01, 2025",
+                eligibility: {
+                  state: "Pennsylvania",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Justin Moeller Memorial Scholarship",
+                description: "This scholarship aims to support underrepresented students who are passionate about IT so they can afford to pursue and achieve their dreams.",
+                applicationLink: "https://bold.org/scholarships/justin-moeller-memorial-scholarship/",
+                amount: "$1,000",
+                deadline: "July 08, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic/Latino", "Asian", "Native American", "BIPOC"],
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Women in STEM Empowerment Scholarship",
+                description: "Every year, Tacuna Systems is pleased to offer a scholarship opportunity for women pursuing a career in STEM.",
+                applicationLink: "https://tacunasystems.com/women-in-stem-empowerment-scholarship/",
+                amount: "$1,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "“Tuition Solution” Scholarship for STEM Students",
+                description: "Our “Tuition Solution” Scholarship is meant for students pursuing a degree in Computer Science or other STEM fields.",
+                applicationLink: "https://scholarships360.org/scholarships/search/tuition-solution-scholarship-for-stem-students/",
+                amount: "$1,000",
+                deadline: "November 8, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Breakthrough Junior Challenge",
+                description: "Are you a middle or high school student with a passion for computer science and/or STEM? If so, consider applying for the Breakthrough Junior Challenge!",
+                applicationLink: "https://breakthroughjuniorchallenge.org/",
+                amount: "$250,000",
+                deadline: "September 15, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School"]
+                }
+              },
+              {
+                name: "Regeneron Science Talent Search",
+                description: "The Regeneron Science Talent Search (Regeneron STS) is the United States’ oldest and most prestigious pre-college science competition, providing an important forum for original research…",
+                applicationLink: "https://www.societyforscience.org/regeneron-sts/application-requirements/",
+                amount: "$2,000 - $250,000",
+                deadline: "November 6, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Generation Google Scholarship",
+                description: "Have you been accepted to or plan to be enrolled in a Bachelor's degree program this upcoming academic year to study computer science, computer engineering,…",
+                applicationLink: "https://buildyourfuture.withgoogle.com/scholarships/generation-google-scholarship/",
+                amount: "$10,000",
+                deadline: "August 14, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Designli Empowering Women in Tech Scholarship",
+                description: "Are you a female high school senior, undergraduate, or graduate student with a passion for technology and entrepreneurship?",
+                applicationLink: "https://designli.co/women-in-tech-scholarship",
+                amount: "$3,000",
+                deadline: "November 30, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Minecraft Scholarship",
+                description: "Are you a high school or college student with a love for Minecraft?",
+                applicationLink: "https://apexminecrafthosting.com/minecraft-scholarship/",
+                amount: "$2,000",
+                deadline: "July 31, 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School", "Undergraduate"]
+                }
+              },
+              {
+                name: "MPOWER Women in STEM Scholarship",
+                description: "Are you an international or DACA female student looking to earn a STEM degree abroad? If so, you may be eligible for the MPOWER Women…",
+                applicationLink: "https://www.mpowerfinancing.com/scholarships/women-in-stem/#schoollist",
+                amount: "$1,000 - $5,000",
+                deadline: "August 31, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "NSHSS Foundation STEM Scholarship",
+                description: "The NSHSS Foundation STEM Scholarship is an amazing opportunity for college-bound high school students who have a demonstrated desire to major in or pursue a…",
+                applicationLink: "https://www.nshss.org/scholarships/s/nshss-foundation-stem-scholarship-2025/",
+                amount: "$1,000",
+                deadline: "October 20, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Zonta Madison Women in STEM Award",
+                description: "This award is for women pursuing a degree in a STEM field.",
+                applicationLink: "https://zonta.org/web/programs/education/zonta_women_in_stem_award.aspx",
+                amount: "$1,000",
+                deadline: "October 1, 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Society of Women Engineers (SWE) Scholarship",
+                description: "Are you a woman studying at a community college, baccalaureate, or graduate school with plans to work in engineering, engineering technology, or computer science?",
+                applicationLink: "https://swe.org/scholarships/",
+                amount: "Up to $5,200",
+                deadline: "Varies",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "SBB Research Group STEM Scholarship",
+                description: "Are you a full-time student studying Science, Technology, Engineering, or Mathematics? The SBB Research Group STEM Scholarship could be a good fit for you!",
+                applicationLink: "https://www.sbbscholarship.com/",
+                amount: "$2,500",
+                deadline: "Rolling",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Flatiron School Access Scholarship",
+                description: "Are you attending the Flatiron School and are from an underrepresented community or background? If so, consider applying for the Flatiron School Access Scholarship!",
+                applicationLink: "https://flatironschool.com/tuition-financing/",
+                amount: "Up to $2,000",
+                deadline: "Rolling",
+                eligibility: {
+                  state: "Any",
+                  race: ["BIPOC", "Underrepresented"],
+                  gender: "Any",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Microsoft Cybersecurity Scholarship Program",
+                description: "Are you currently enrolled in a two-year cybersecurity-related program in the U.S? If so, consider applying for the Microsoft Cybersecurity Scholarship Program!",
+                applicationLink: "https://www.lastmile-ed.org/microsoftcybersecurityscholarship#:~:text=the%20microsoft%20cybersecurity%20scholarship%20program,costs%20(up%20to%20%24375).&text=all%20students%20with%20financial%20need%20are%20eligible%20to%20apply.",
+                amount: "Up to $500",
+                deadline: "Rolling",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Churchill Scholarship",
+                description: "Are you a current college senior or graduate interested in obtaining a master's from Cambridge in a STEM field? If so, consider applying for the…",
+                applicationLink: "https://www.churchillscholarship.org/the-scholarship#apply",
+                amount: "$70,000",
+                deadline: "November 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Senior", "Graduate"]
+                }
+              },
+              {
+                name: "Davidson Institute Fellows Scholarship",
+                description: "Are you a K-12 student who has created a significant piece of work in the field of STEM, literature, music, or philosophy? The Davidson Institute…",
+                applicationLink: "https://www.davidsongifted.org/gifted-programs/fellows-scholarship/eligibility-and-application/how-to-apply/",
+                amount: "Up to $50,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School"]
+                }
+              },
+              {
+                name: "SMART Scholarship Program",
+                description: "Are you a current postsecondary student pursuing a STEM degree? If so, consider applying for the SMART Scholarship Program! The scholarship is open to undergraduate…",
+                applicationLink: "https://www.smartscholarship.org/smart",
+                amount: "$30,000 - $46,000",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+           
+              {
+                name: "KPMG Future Leaders Program",
+                description: "Are you an academically exceptional female student who plans to attend a college or university and study Business or STEM?",
+                applicationLink: "https://womensleadership.kpmg.us/charitable/developing-future-generations-women-leaders1.html",
+                amount: "$10,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "FOSSI Scholarship",
+                description: "Are you a current or soon-to-be high school graduate planning on studying or majoring in a STEM field at an HBCU (Historically Black College or…",
+                applicationLink: "https://futureofstemscholars.org/fossi/apply",
+                amount: "$40,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Black"],
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Amazon Future Engineer Scholarship",
+                description: "Are you a future engineer in your senior year of high school? Consider applying to the Amazon Future Engineer Scholarship! The Amazon Future Engineer Scholarship…",
+                applicationLink: "https://scholarshipamerica.org/amazonfutureengineer/",
+                amount: "Up to $40,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Jacobs Family New Bedford High School Scholarship",
+                description: "STEM students, this one’s for you! Worth up to $35,000, the Jacobs Family New Bedford High School Scholarship is here to help you turn your…",
+                applicationLink: "https://southcoastcf.org/2024-scholarship-opportunities/",
+                amount: "Up to $35,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Howard D. Colman Scholarship",
+                description: "The Howard D. Colman Scholarship program recognizes graduating high school seniors who are residents of Boone or Winnebago counties in Illinois. Students pursuing a degree…",
+                applicationLink: "https://www.cfnil.org/scholarships/howard-d-colman-scholarship",
+                amount: "$2,500 - $32,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Illinois",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Washington State Opportunity Scholarship – Baccalaureate Scholarship",
+                description: "The Baccalaureate Scholarship program is available to residents of Washington who are seeking a bachelor’s degree in a STEM or health care related field.",
+                applicationLink: "https://waopportunityscholarship.org/applicants/baccalaureate/",
+                amount: "Up to $22,500",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Washington",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Meyerhoff Scholars Program",
+                description: "The Meyerhoff Scholars Program is offered to graduating high school seniors who plan to pursue a Ph.D. or combined M.D./Ph.D. in the sciences, technology, engineering,…",
+                applicationLink: "https://umbc.academicworks.com/opportunities/7132",
+                amount: "$5,000 - $22,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Science Ambassador Scholarship",
+                description: "The Science Ambassador Scholarship is funded by Cards Against Humanity, an adult party card game company that supports charity efforts with its profits.",
+                applicationLink: "https://www.scienceambassadorscholarship.org/",
+                amount: "$20,000",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "CodeHouse Scholars Program",
+                description: "The CodeHouse Scholars Program is awarded to Black/African American, Latinx, or Native American graduating high school seniors. Students who are planning to study computer and…",
+                applicationLink: "https://www.thecodehouse.org/codehouse-scholars",
+                amount: "Up to $20,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Latinx", "Native American"],
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Selected Professions Fellowship",
+                description: "Are you a woman in a traditionally male-dominated master's degree program? If so, you might be interested in applying for the Selected Professions Fellowship!",
+                applicationLink: "https://www.aauw.org/resources/programs/fellowships-grants/current-opportunities/selected-professions-fellowship-program/",
+                amount: "Up to $20,000",
+                deadline: "November 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Graduate"]
+                }
+              },
+              {
+                name: "Massachusetts High Demand Scholarship",
+                description: "Are you a Massachusetts resident (of at least one year) who is enrolled in an in-state, public or independent university? Further, are you pursuing a STEM…",
+                applicationLink: "https://www.mass.edu/osfa/programs/highdemand.asp",
+                amount: "Up to $17,500",
+                deadline: "July 2026",
+                eligibility: {
+                  state: "Massachusetts",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "McKnight Doctoral Fellowship Program",
+                description: "The McKnight Doctoral Fellowship program is a great program designed to address the underrepresentation of African American and Hispanic faculty at colleges and universities in…",
+                applicationLink: "https://www.fefonline.org/mdf.html",
+                amount: "$17,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic"],
+                  gender: "Any",
+                  grade: ["Graduate"]
+                }
+              },
+              {
+                name: "Astronaut Scholarship",
+                description: "Are you a rising college junior or senior pursuing a STEM (Science, Technology, Engineering, & Math) degree in the United States?",
+                applicationLink: "https://www.astronautscholarship.org/scholarshipprogram.html",
+                amount: "Up to $15,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Junior", "Undergraduate Senior"]
+                }
+              },
+              {
+                name: "National Space Club and Foundation Keynote Scholarship",
+                description: "Are you a student planning to pursue a career in a STEM field? If so, consider applying for the National Space Club and Foundation Keynote…",
+                applicationLink: "https://www.spaceclub.org/scholarship/index.html",
+                amount: "$15,000",
+                deadline: "November 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Perryman Family Foundation College Scholarship",
+                description: "Are you a current or incoming undergraduate student pursuing a degree in science, technology, engineering, and/or mathematics?",
+                applicationLink: "https://perrymanfoundation.org/",
+                amount: "$10,000 - $15,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Edison Scholars Program",
+                description: "The Edison Scholars Program is designed to support exceptional high school seniors in Southern California pursuing a degree in STEM at a four-year college or…",
+                applicationLink: "https://www.edison.com/community/edison-scholars?ecid=schl_entst015",
+                amount: "Up to $12,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Southern California",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Best Buy Health Scholars Program (Undergraduates)",
+                description: "Are you a current or incoming first-year undergraduate student with a passion for STEM (with a healthcare focus)?",
+                applicationLink: "https://opportunities.uncf.org/s/program-landing-page?id=a2ivj00000oshvbyan",
+                amount: "Up to $12,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman"]
+                }
+              },
+              {
+                name: "Pittsburgh ERG Scholarship",
+                description: "The Pittsburgh ERG Scholarship enables high school students with disabilities and/or financial needs to go to college and pursue a career in a STEM field.",
+                applicationLink: "https://pittsburghfoundation.org/scholarship/10842",
+                amount: "Up to $12,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Hyundai Women in STEM Scholarship",
+                description: "Are you a high school senior or college undergraduate who identifies as female, resides in the United States, and wishes to pursue a STEM-related field?",
+                applicationLink: "https://www.tun.com/scholarships/the-hyundai-women-in-stem-scholarship/",
+                amount: "$10,000",
+                deadline: "June 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Pacific Gas and Electric Company Better Together STEM Scholarship Program",
+                description: "The Pacific Gas and Electric Company Better Together STEM Scholarship Program is an opportunity for local students to advance their undergraduate studies and contribute to…",
+                applicationLink: "https://www.pge.com/en_US/residential/in-your-community/education-programs/grants-and-scholarships/scholarship-opportunities/scholarship-opportunities.page?WT.mc_id=Vanity_scholarships",
+                amount: "$2,500 - $10,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "BMO Capital Markets Lime Connect Equity Through Education Scholarship",
+                description: "The scholarship is open to students with disabilities who are enrolled in a college or university and pursuing a degree in a business- or technology-related field.",
+                applicationLink: "https://www.limeconnect.com/programs/page/bmo-capital-markets-lime-connect-equity-through-education-scholarship",
+                amount: "Up to $10,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "STEM Scholarship For A Bright Future",
+                description: "If you're a minority student aspiring to pursue a degree and career in STEM, look no further! The For A Bright Future Foundation may have the perfect scholarship opportunity for you!",
+                applicationLink: "https://www.forabrightfuturefoundation.org/scholarships",
+                amount: "$2,500 - $10,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Minority",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+           
+              {
+                name: "Samsung@First Scholarship",
+                description: "Samsung@First Scholars is the perfect opportunity for undergraduates (sophomores, juniors, and seniors) or master's students in California who are passionate about science, technology, engineering, or…",
+                applicationLink: "https://www.siliconvalleycf.org/scholarships/samsung-first-scholarship",
+                amount: "Up to $10,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "California",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior", "Undergraduate Senior", "Graduate"]
+                }
+              },
+              {
+                name: "Single Parent Household Scholarship For A Bright Future",
+                description: "This scholarship is for students from a single parent household.",
+                applicationLink: "https://www.forabrightfuturefoundation.org/scholarships",
+                amount: "$2,500 - $10,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Veterans and Families Scholarship For A Bright Future",
+                description: "Are you a military veteran or the relative of one? Further, are you a minority planning to pursue a degree in education, STEM…",
+                applicationLink: "https://www.forabrightfuturefoundation.org/scholarships",
+                amount: "$2,500 - $10,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Minority",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "AIAA Lockheed Martin Marillyn Hewson Scholarship",
+                description: "Are you a young woman with dreams of pursuing a career in science or engineering?",
+                applicationLink: "https://www.aiaa.org/get-involved/k-12-students/scholarships/aiaa-lockheed-martin-marillyn-hewson-scholarship",
+                amount: "Up to $10,000",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "FinTech Innovation Scholarship For A Bright Future",
+                description: "Fintech, or financial technology, refers to the computer programs and other technology used to support or enable banking and financial services.",
+                applicationLink: "https://www.forabrightfuturefoundation.org/scholarships",
+                amount: "$2,500 - $10,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Diversify the Future Foundation STEM Scholarship",
+                description: "Although STEM is a diverse field in itself, comprised of many different subfields that vary in subject matter and profession types, certain groups of people…",
+                applicationLink: "https://www.diversifythefuture.com/scholarship-fund",
+                amount: "Up to $10,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "NFB STEM Scholarship",
+                description: "The NFB STEM Scholarship provides financial assistance to blind students seeking their undergraduate or graduate degrees.",
+                applicationLink: "https://www.nfb.org/programs-services/scholarships-and-awards/scholarship-program/scholarships",
+                amount: "Up to $8,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Oracle Scholarship for Excellence in STEM",
+                description: "The Oracle Scholarship for Excellence in STEM provides scholarships to blind undergraduate and graduate students.",
+                applicationLink: "https://www.nfb.org/programs-services/scholarships-and-awards/scholarship-program/scholarships",
+                amount: "Up to $8,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Kellie Cannon Memorial Scholarship",
+                description: "To help fund the higher education of legally blind students with a passion for computer science, web development, or related fields…",
+                applicationLink: "https://www.acb.org/scholarships",
+                amount: "$2,000 - $7,500",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Barry Goldwater Scholarship",
+                description: "Are you a current college student interested in pursuing a research career in a STEM field?",
+                applicationLink: "https://goldwaterscholarship.gov/",
+                amount: "Up to $7,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Latinos in Technology Scholarship",
+                description: "Are you a Latino or Hispanic student who has been accepted to a postsecondary STEM program?",
+                applicationLink: "https://www.hfsv.org/latinos-in-technology-scholarship/",
+                amount: "Up to $6,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["Latino", "Hispanic"],
+                  gender: "Any",
+                  grade: ["Undergraduate Junior", "Undergraduate Senior"]
+                }
+              },
+              {
+                name: "RADM Lillian Fishburne Leidos STEM Scholarship",
+                description: "The RADM Lillian Fishburne Leidos STEM Scholarship is awarded to children and spouses of U.S. Navy sailors who are pursuing a STEM degree.",
+                applicationLink: "https://anchorscholarship.org/administered-scholarships/",
+                amount: "Up to $6,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Admiral Grace Murray Hopper Scholarship",
+                description: "Are you a current college freshman studying Computer Science or Computer Engineering?",
+                applicationLink: "https://swe.org/scholarships/admiral-grace-murray-hopper-scholarship-est-1992/",
+                amount: "$5,100",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Freshman"]
+                }
+              },
+              {
+                name: "Microsoft Disability Scholarship",
+                description: "Are you an academically impressive high school senior with a disability who plans to attend a vocational or academic college and target a career in…",
+                applicationLink: "https://www.microsoft.com/en-us/diversity/programs/microsoftdisabilityscholarship",
+                amount: "Up to $5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "UNCF STEM Scholars Program",
+                description: "Are you a Black, Hispanic, Asian/Pacific Islander, or Native American high school senior who will be pursuing an undergraduate degree in a STEM field?",
+                applicationLink: "https://uncf.org/programs/fund-ii-uncf-stem-scholars",
+                amount: "Up to $5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["African American", "Hispanic", "Asian/Pacific Islander", "Native American"],
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Hawaii Chapter AFCEA STEM Scholarships",
+                description: "Hawaii Chapter AFCEA STEM Scholarships open to high school seniors, undergraduate, graduate, and professional certificate students seeking a professional certification or degree in a STEM-related…",
+                applicationLink: "https://www.afceahawaii.org/education-programs#:~:text=AFCEA%20Hawaii%20STEM%20Scholarships,to%20include%20cyber%20and%20intelligence.",
+                amount: "$5,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Hawaii",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "ISC2 Graduate Scholarship",
+                description: "Are you a graduate student pursuing a degree in cybersecurity, information assurance, or a related field?",
+                applicationLink: "https://www.iamcybersafe.org/s/graduate-scholarships",
+                amount: "$1,000 - $5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Graduate"]
+                }
+              },
+              {
+                name: "Black at Microsoft Scholarship",
+                description: "Are you a graduating, high school senior of African descent who plans on attending a U.S. four-year university in the Fall following graduation?",
+                applicationLink: "https://www.microsoft.com/en-us/diversity/programs/bam-scholarship",
+                amount: "$2,500 - $5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "African American",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "U.S. Western Digital STEM Scholarships",
+                description: "The U.S. Western Digital STEM Scholarships are a fantastic opportunity for students demonstrating financial need or hardship who are currently attending a two-year university and…",
+                applicationLink: "https://www.westerndigital.com/company/corporate-responsibility/philanthropy",
+                amount: "Up to $5,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Project SEED Scholarship",
+                description: "The Project SEED Scholarship offers financial assistance for college to high school seniors and college freshmen participants in the American Chemical Society's Project SEED: Summer…",
+                applicationLink: "https://www.acs.org/content/acs/en/education/students/highschool/seed/scholarship.html",
+                amount: "$2,500 - $5,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman"]
+                }
+              },
+              {
+                name: "(ISC)2 Undergraduate Scholarships",
+                description: "The (ISC)2 Undergraduate Scholarships provide financial assistance to students interested in working on an undergraduate degree in cyber security or information assurance.",
+                applicationLink: "https://www.iamcybersafe.org/s/undergraduate-scholarships",
+                amount: "$1,000 - $5,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Samantha Jennings-Jones Memorial Scholarship",
+                description: "The Samantha Jennings-Jones Memorial Scholarship is available to women pursuing a degree in cyber security or information assurance.",
+                applicationLink: "https://www.iamcybersafe.org/s/samantha-jennings-jones-memorial-scholar",
+                amount: "Up to $5,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior", "Graduate"]
+                }
+              },
+              {
+                name: "YASME Foundation Scholarship",
+                description: "Do you hold a General Class or higher ***** Radio license and have been licensed for at least two years? If so, you may be…",
+                applicationLink: "https://www.arrl.org/scholarship-descriptions",
+                amount: "$5,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+           
+             
+           
+           
+              {
+                name: "Endeavour’s Women in Tech Group Engineering Scholarship – High School",
+                description: "The Endeavour's Women in Tech Group Engineering Scholarship - High School is available to women planning to pursue higher education in the engineering field.",
+                applicationLink: "https://www.endeavourii.com/scholarships",
+                amount: "$2,000 - $5,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "NVTC Foundation Kilberg Scholarship",
+                description: "The NVTC Foundation Kilberg Scholarship is open to female residents of northern Virginia of any age. Applicants should be graduating high school seniors, high school…",
+                applicationLink: "https://www.cfnova.org/scholarship/nvtc-foundation-kilberg-scholarship-fund",
+                amount: "Up to $5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Northern Virginia",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Chevron/SWE Scholarship",
+                description: "Are you a SWE member and female undergraduate student (excluding seniors) planning on pursuing an engineering-related degree at an HBCU (Historically Black Colleges & Institutions)…",
+                applicationLink: "https://swe.org/scholarships/chevron-swe-scholarship/",
+                amount: "$5,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Davis-Kozoll Scholarship",
+                description: "Are you a college-bound high school senior from northwest New Mexico who will be pursuing a master’s, bachelor’s, associate's degree, or technical/vocational certificate in a…",
+                applicationLink: "https://abqcf.org/scholarships-for-new-mexico-high-school-students/",
+                amount: "$1,000 - $5,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "New Mexico",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Women’s Employee Resource Group Scholarship",
+                description: "The Women's Employee Resource Group Scholarship provides financial assistance to graduating high school seniors in the Pacific Gas and Electric Company's (PG&E) service area in…",
+                applicationLink: "https://www.pge.com/en_US/residential/in-your-community/education-programs/grants-and-scholarships/scholarship-opportunities/scholarship-opportunities.page",
+                amount: "$1,500 - $4,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "California",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Nathan L. Anderson Memorial Scholarship",
+                description: "The Nathan L. Anderson Memorial Scholarship provides financial assistance to minority students interested in working on a bachelor's degree in specified fields.",
+                applicationLink: "https://www.rememberingnathananderson.org/",
+                amount: "$1,500 - $4,000",
+                deadline: "July 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Minority",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "American Society of Naval Engineers Scholarship",
+                description: "The American Society of Naval Engineers began its scholarship program in 1979 to promote the profession of naval engineering and to encourage college students to…",
+                applicationLink: "https://www.navalengineers.org/Education/Scholarships",
+                amount: "$4,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Junior", "Undergraduate Senior", "Graduate"]
+                }
+              },
+              {
+                name: "Roger and Barbara Powell Scholarship for Engineering",
+                description: "The Roger and Barbara Powell Scholarship for Engineering is available to rural Texas residents pursuing an in-state engineering or computer science degree.",
+                applicationLink: "https://ghcf.org/what-we-do/scholarship-funds/",
+                amount: "Up to $4,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Texas",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Women In STEM Excel Scholarship",
+                description: "The WISE (Women in STEM Excel) Scholarship was created by Dr. Alexander Sobel to support, empower, and encourage women in Washington to pursue an education…",
+                applicationLink: "https://www.andersonsobelcosmetic.com/wise-scholarship/",
+                amount: "$3,500",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Washington",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "SWE Phoenix Section Scholarship",
+                description: "The SWE Phoenix Section Scholarship is for female students from Arizona who are planning to attend schools in Arizona in any engineering, technology, or computing…",
+                applicationLink: "https://swe.org/scholarships/swe-phoenix-section-scholarship-est-2011/",
+                amount: "$3,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Arizona",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior", "Undergraduate Senior"]
+                }
+              },
+              {
+                name: "Canada Life + Lime Connect Technology Internship & Scholarship Award",
+                description: "Are you an undergraduate student in Canada who has a disability and is pursuing a degree in computer science or a related field?",
+                applicationLink: "https://limeconnect.com/awards/canada-life-lime-connect-technology-internship-scholarship-award/",
+                amount: "$3,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Canada",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Pi-Squared Scholarship",
+                description: "The Pi-Squared Scholarship is available to seniors graduating from Spring, Klein, or Houston ISDs in Texas. Applicants pursuing a STEM degree (especially math, statistics, physics,…",
+                applicationLink: "https://ghcf.org/what-we-do/scholarship-funds/",
+                amount: "Up to $3,141",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Texas",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "ROTC Scholarship Program",
+                description: "The ROTC Scholarship Program offers awards to Army, Navy (including Marine Corps option), or Air Force ROTC students. Applicants must be enrolled full-time in a…",
+                applicationLink: "https://www.goarmy.com/careers-and-jobs/find-your-path/army-officers/rotc/scholarships",
+                amount: "$2,500 - $3,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Nevada NASA Space Grant Consortium Undergraduate Scholarships",
+                description: "The Nevada NASA Space Grant Consortium Undergraduate Scholarships annually award $3,000 grants to support independently conceived research or hands-on- projects by NSHE undergraduate students in…",
+                applicationLink: "https://nasa.epscorspo.nevada.edu/funding/2025-2026-nvsgc-ug/",
+                amount: "$3,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Nevada",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Ralph W. Shrader Graduate Diversity Scholarship",
+                description: "The Ralph W. Shrader Graduate Diversity Scholarship is offering multiple $3000 scholarships to full-time graduate students pursuing a STEM/hard sciences degree.",
+                applicationLink: "https://www.afcea.org/shrader-graduate-scholarship",
+                amount: "$3,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Graduate"]
+                }
+              },
+              {
+                name: "AFCEA Joan Bowden ROTC Scholarship",
+                description: "The AFCEA Joan Bowden ROTC Scholarship is presented annually to a STEM (Science, Technology, Engineering, and Math) student who participates in the ROTC program at…",
+                applicationLink: "https://www.afcea.org/rotc-scholarships",
+                amount: "$3,000",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Lambeth Family Scholarship",
+                description: "The Lambeth Family Scholarship is available to high school seniors who are residents of Washington. Students planning to pursue postsecondary education in business, computer science/information…",
+                applicationLink: "https://www.seattlefoundation.org/current-scholarship-opportunities",
+                amount: "$1,000 - $3,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Washington",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Joseph James Morelli Legacy Foundation Scholarship",
+                description: "Are you a high school student with dyslexia or a similar disability who wants to pursue a degree in the STEM field?",
+                applicationLink: "https://morelli.foundation/",
+                amount: "$500 - $2,500",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "AIST Ohio Valley Chapter Scholarship",
+                description: "Are you a current or incoming college student who is an AIST (Association for Iron & Steel Technology) member or the child (including step-children, adopted…",
+                applicationLink: "https://www.aist.org/students-faculty/scholarships/member-chapter-scholarships/ohio-valley",
+                amount: "$2,500",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+           
+              {
+                name: "AISES Burlington Northern Santa Fe (BNSF) Foundation Scholarship",
+                description: "The AISES Burlington Northern Santa Fe (BNSF) Foundation Scholarship is awarded to graduating high school seniors and current college students from states served by the…",
+                applicationLink: "https://aises.org/scholarships/",
+                amount: "$2,500",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Native American",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Intertech Foundation STEM Scholarship",
+                description: "The Intertech Foundation STEM Scholarship offers financial assistance for college to exceptional graduating high school seniors with a GPA of 3.3 or higher.",
+                applicationLink: "https://www.intertech.com/about/foundation/scholarship",
+                amount: "Up to $2,500",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "WomenIn Scholarship",
+                description: "The WomenIn Scholarship is funded by the Academy of Interactive Arts & Sciences, an organization that looks to cultivate an inclusive, worldwide, creative entertainment business…",
+                applicationLink: "https://www.aiasfoundation.org/programs/womenin_scholarship_application.asp",
+                amount: "$2,500",
+                deadline: "May 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "Cold War Veterans STEM Scholarship",
+                description: "The Cold War STEM Scholarship is available to Marines' Memorial Association members or their children or grandchildren. Graduating high school seniors or undergraduate students seeking…",
+                applicationLink: "https://www.marinesmemorial.org/scholarships/cold-war-veterans",
+                amount: "Up to $2,500",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Cummins First Generation Women of Color Scholarship",
+                description: "The Cummins First Generation Women of Color Scholarship is seeking female applicants who plan to attend an HBCU (Historically Black College or University) or HSI…",
+                applicationLink: "https://swe.org/scholarships/cummins-scholarship-for-freshmen/",
+                amount: "$2,500",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior", "Graduate"]
+                }
+              },
+              {
+                name: "AT&T/The NETwork BICP – Lewis Latimer Scholarship",
+                description: "Are you passionate about science or the arts? If so, you should consider applying for the Lewis Latimer Scholarship! This scholarship was created to assist…",
+                applicationLink: "https://www.thenetworkbicp.org/scholarships",
+                amount: "Up to $2,500",
+                deadline: "September 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "Deloitte Foundation Scholarship",
+                description: "Are you a full- or part-time undergraduate student pursuing a degree related to accounting, business, or technology at a HACU member institution?",
+                applicationLink: "https://www.deloitte.com/us/en/about/deloitte-foundation/deloitte-foundation-college-scholarships.html",
+                amount: "$2,500",
+                deadline: "June 2026",
+                eligibility: {
+                  state: "Any",
+                  race: ["Hispanic", "Latino"],
+                  gender: "Any",
+                  grade: ["Undergraduate"]
+                }
+              },
+              {
+                name: "Interstellar Research Group Undergraduate College Scholarship Program",
+                description: "Are you a current or incoming undergraduate student pursuing a degree in any field that can be applied to interstellar space travel missions and to…",
+                applicationLink: "https://irg.space/2025-scholarships/",
+                amount: "$2,500",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Interstellar Research Group Master's Graduate College Scholarship Program",
+                description: "Are you a current master's student pursuing a degree in any field that can be applied to interstellar space travel missions and to help establish…",
+                applicationLink: "https://irg.space/2025-scholarships/",
+                amount: "$2,500",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Graduate"]
+                }
+              },
+              {
+                name: "William Griggs Memorial Scholarship for Science and Math",
+                description: "Introducing the William Griggs Memorial Scholarship for Science and Math, a tribute to a remarkable man who believed that the vast expanse of space held…",
+                applicationLink: "https://ndsu.academicworks.com/opportunities/26307",
+                amount: "$2,500",
+                deadline: "June 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Hans P. Loewen Scholarship",
+                description: "Hans P. Loewen, an outstanding midshipman third class at the US Naval Academy at only 20-years-old, was a man of many interests and talents.",
+                applicationLink: "https://www.ans.org/scholarships/loewen/",
+                amount: "Up to $2,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore"]
+                }
+              },
+              {
+                name: "Skyline Technologies Scholarship",
+                description: "The Skyline Technologies Scholarship supports seniors graduating from a high school in the NEW North Region in Wisconsin. Applicants should be pursuing a career in…",
+                applicationLink: "https://collegereadywi.org/scholarships/",
+                amount: "Up to $2,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Wisconsin",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Daniel R. Miller (Fretts) Memorial Scholarship",
+                description: "The Daniel R. Miller (Fretts) Memorial Scholarship is available to current college students as well as graduating seniors from Southmoreland High School or Central Westmoreland…",
+                applicationLink: "https://pittsburghfoundation.org/scholarships",
+                amount: "$1,000 - $2,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Space Coast Chapter Women in Defense STEM Scholarship",
+                description: "The Space Coast Chapter Women in Defense STEM Scholarship is available to female high school seniors, undergraduates, and graduate students in Brevard County, Florida.",
+                applicationLink: "https://widsc.org/scholarships/",
+                amount: "$250 - $2,000",
+                deadline: "April 2026",
+                eligibility: {
+                  state: "Florida",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["High School Senior", "Undergraduate", "Graduate"]
+                }
+              },
+              {
+                name: "NSHSS Innovation in Technology Scholarship",
+                description: "Are you a high school senior or college freshman, sophomore, or junior with a dedicated passion for AI, technology, or coding?",
+                applicationLink: "https://www.nshss.org/scholarships/s/nshss-innovation-in-technology-scholarship-2025/",
+                amount: "$2,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate Freshman", "Undergraduate Sophomore", "Undergraduate Junior"]
+                }
+              },
+              {
+                name: "NASA’s Virginia Space Grant Consortium Community College STEM Scholarships",
+                description: "The Community College STEM Scholarship annually awards $2,000 to rising Virginia community college sophomores (current freshmen) who are majoring in a science, technology, engineering, or…",
+                applicationLink: "https://vsgc.odu.edu/communitycollegescholarships/",
+                amount: "$2,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Virginia",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["Undergraduate Freshman"]
+                }
+              },
+              {
+                name: "T. Eugene Young Montana’s Promise Scholarship",
+                description: "The T. Eugene Young Montana's Promise Scholarship is a need and merit-based program that supports graduating seniors of a Montana high school. Students who are…",
+                applicationLink: "https://mtcf.org/scholarship/t-eugene-young-montanas-promise-scholarship",
+                amount: "$1,000 - $2,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Montana",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior"]
+                }
+              },
+              {
+                name: "Betty Lou Bailey SWE Region F Scholarship",
+                description: "The Betty Lou Bailey SWE Region F Scholarship is for female applicants planning to study a full-time ABET-accredited program in engineering, technology, or computing in…",
+                applicationLink: "https://swe.org/scholarships/betty-lou-bailey-swe-region-f-scholarship-est-2010/",
+                amount: "$2,000",
+                deadline: "January 2026",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Female",
+                  grade: ["Undergraduate Sophomore", "Undergraduate Junior", "Undergraduate Senior", "Graduate"]
+                }
+              },
+              {
+                name: "PixelPlex Bi-Annual STEM Scholarship",
+                description: "Are you a U.S. citizen or permanent resident who will soon be enrolled in a postsecondary institution with intentions of studying a STEM, business, or…",
+                applicationLink: "https://www.petersons.com/scholarship/-pixelplex-bi-annual-stem-scholarship-111_224325.aspx",
+                amount: "$2,000",
+                deadline: "December 2025",
+                eligibility: {
+                  state: "Any",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "Sims Family Technology Scholarship",
+                description: "The Sims Family Technology Scholarship is available to residents of West Virginia seeking a degree in information technology in West Virginia. Students planning to specialize…",
+                applicationLink: "https://tgkvf.org/scholarship-information/",
+                amount: "Up to $2,000",
+                deadline: "February 2026",
+                eligibility: {
+                  state: "West Virginia",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              },
+              {
+                name: "James K. Goldston Cybersecurity Scholarship",
+                description: "The James K. Goldston Cybersecurity Scholarship was established in 2006 by the family of James K. Goldston to assist students from Tennessee to pursue in-state…",
+                applicationLink: "https://easttennesseefoundation.org/scholarships/james-k-goldston-cybersecurity-scholarship-fund/",
+                amount: "$2,000",
+                deadline: "March 2026",
+                eligibility: {
+                  state: "Tennessee",
+                  race: "Any",
+                  gender: "Any",
+                  grade: ["High School Senior", "Undergraduate"]
+                }
+              }
+        ];
+
+
+
+
+        // All US states for the dropdowns
+        const states = [
+            "Any", "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+            "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+            "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+            "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+            "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+            "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+        ];
+
+        // Get DOM elements for all the different parts of the UI
+        const searchPage = document.getElementById('search-page');
+        const resultsPage = document.getElementById('results-page');
+        const favoritesPage = document.getElementById('favorites-page');
+        const searchButton = document.getElementById('search-button');
+        const backToSearchBtn = document.getElementById('back-to-search-btn');
+        const backFromFavoritesBtn = document.getElementById('back-from-favorites-btn');
+        const viewFavoritesBtn = document.getElementById('view-favorites-btn');
+        const scholarshipList = document.getElementById('scholarship-list');
+        const favoritesList = document.getElementById('favorites-list');
+        const noResultsMessage = document.getElementById('no-results');
+        const noFavoritesMessage = document.getElementById('no-favorites');
+        const loadingMessage = document.getElementById('loading-message');
+        const stateSelect = document.getElementById('state');
+        const sortBySelect = document.getElementById('sort-by-select');
+        const resultsPaginationControls = document.getElementById('results-pagination-controls');
+        const favoritesPaginationControls = document.getElementById('favorites-pagination-controls');
+
+        // Dynamically populate the state dropdown menus with all US states
+        states.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateSelect.appendChild(option);
+        });
+
+        // --- UI Rendering and Logic ---
+
+        // Helper function to show a specific page and hide all others
+        const showPage = (pageId) => {
+            searchPage.classList.add('hidden');
+            resultsPage.classList.add('hidden');
+            favoritesPage.classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+        };
+
+        // Function to create and return a scholarship card HTML element
+        const renderScholarshipCard = (scholarship) => {
+            const isSaved = favoriteIds.has(scholarship.id);
+            const card = document.createElement('div');
+            card.className = "bg-white border border-gray-200 rounded-lg shadow-sm p-5 space-y-3 transition-transform hover:scale-105";
+
+            card.innerHTML = `
+                <h3 class="text-xl font-bold text-sky-800">${scholarship.name}</h3>
+                <p class="text-gray-600 mb-2">${scholarship.description}</p>
+                <div class="flex flex-wrap items-center justify-between text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM6 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM10 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6zM14 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 11-3 0v-6z" />
+                        </svg>
+                        Amount: <span class="font-bold text-gray-700 ml-1">${scholarship.amount}</span>
+                    </span>
+                    <span class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                        Deadline: <span class="font-bold text-gray-700 ml-1">${scholarship.deadline}</span>
+                    </span>
+                </div>
+                <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                    <a href="${scholarship.applicationLink}" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-700 font-medium inline-flex items-center">
+                        Apply Here
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                    <button class="favorite-btn p-2 rounded-full transition-colors ${isSaved ? 'bg-red-100 text-red-500' : 'bg-gray-200 text-gray-500'}" data-id="${scholarship.id}" aria-label="${isSaved ? 'Remove from favorites' : 'Add to favorites'}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+            return card;
+        };
+       
+        // Helper function to extract a numeric value from the amount string for sorting
+        const getSortableAmount = (amountString) => {
+            const numbers = amountString.match(/\d{1,3}(?:,\d{3})*(?:\.\d+)?/g);
+            if (!numbers || numbers.length === 0) {
+                return 0;
+            }
+            const sortedNumbers = numbers.map(s => parseInt(s.replace(/,/g, ''), 10)).sort((a, b) => b - a);
+            return sortedNumbers[0];
+        };
+
+        // Helper function to check if a scholarship's criteria matches the user's selection
+        const isEligible = (scholarshipValue, userValue) => {
+            if (userValue === "Any") {
+                return true;
+            }
+            if (scholarshipValue === "Any") {
+                return true;
+            }
+            if (Array.isArray(scholarshipValue)) {
+                return scholarshipValue.includes(userValue);
+            }
+            return scholarshipValue === userValue;
+        };
+
+        // Function to render the scholarships for a given page and update pagination controls
+        const renderPaginatedResults = (page) => {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedResults = currentFilteredResults.slice(startIndex, endIndex);
+
+            scholarshipList.innerHTML = '';
+            if (paginatedResults.length > 0) {
+                noResultsMessage.classList.add('hidden');
+                paginatedResults.forEach(scholarship => {
+                    scholarshipList.appendChild(renderScholarshipCard(scholarship));
+                });
+            } else {
+                noResultsMessage.classList.remove('hidden');
+            }
+
+            renderPaginationControls(currentFilteredResults.length, resultsCurrentPage, resultsPaginationControls);
+        };
+       
+        const renderPaginatedFavorites = (page) => {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedFavorites = currentFavoriteResults.slice(startIndex, endIndex);
+
+            favoritesList.innerHTML = '';
+            if (paginatedFavorites.length > 0) {
+                noFavoritesMessage.classList.add('hidden');
+                paginatedFavorites.forEach(scholarship => {
+                    favoritesList.appendChild(renderScholarshipCard(scholarship));
+                });
+            } else {
+                noFavoritesMessage.classList.remove('hidden');
+            }
+
+            renderPaginationControls(currentFavoriteResults.length, favoritesCurrentPage, favoritesPaginationControls);
+        };
+
+        // Function to filter and display scholarships
+        const filterAndDisplayScholarships = () => {
+            const state = document.getElementById('state').value;
+            const race = document.getElementById('race').value;
+            const gender = document.getElementById('gender').value;
+            const grade = document.getElementById('grade').value;
+            const sortBy = sortBySelect.value;
+            const now = new Date(); // Get the current date and time
+
+            let results = allScholarships.filter(scholarship => {
+                // First, check if the scholarship's deadline has passed
+                const deadlineDate = new Date(scholarship.deadline);
+                const hasDeadlinePassed = deadlineDate < now;
+                if (hasDeadlinePassed) {
+                    return false; // Skip this scholarship if the deadline is in the past
+                }
+
+                // Then, apply the user's search criteria
+                const eligibility = scholarship.eligibility || {};
+                const isStateMatch = isEligible(eligibility.state, state);
+                const isRaceMatch = isEligible(eligibility.race, race);
+                const isGenderMatch = isEligible(eligibility.gender, gender);
+                const isGradeMatch = isEligible(eligibility.grade, grade);
+
+                return isStateMatch && isRaceMatch && isGenderMatch && isGradeMatch;
+            });
+
+            // Sort the results based on the user's selection
+            if (sortBy === 'deadline') {
+                results.sort((a, b) => {
+                    const dateA = new Date(a.deadline);
+                    const dateB = new Date(b.deadline);
+                    return dateA - dateB;
+                });
+            } else if (sortBy === 'amount') {
+                results.sort((a, b) => {
+                    const amountA = getSortableAmount(a.amount);
+                    const amountB = getSortableAmount(b.amount);
+                    return amountB - amountA; // Sort from high to low
+                });
+            }
+
+            // Store the full, filtered result set and reset the current page
+            currentFilteredResults = results;
+            resultsCurrentPage = 1;
+            renderPaginatedResults(resultsCurrentPage);
+            showPage('results-page');
+        };
+       
+        // New helper function to re-render the current results page without resetting it
+        const renderCurrentResultsPage = () => {
+            renderPaginatedResults(resultsCurrentPage);
+            showPage('results-page');
+        };
+
+        // New helper function to re-render the current favorites page without resetting it
+        const renderCurrentFavoritesPage = () => {
+            displayFavorites();
+            showPage('favorites-page');
+        };
+       
+        // Function to render and display saved scholarships
+        const displayFavorites = () => {
+            const now = new Date(); // Get the current date and time
+           
+            let favoriteScholarships = allScholarships.filter(s => {
+                const deadlineDate = new Date(s.deadline);
+                return favoriteIds.has(s.id) && deadlineDate > now; // Only show favorites with a future deadline
+            });
+           
+            // Apply sorting to favorites as well
+            const sortBy = sortBySelect.value;
+            if (sortBy === 'deadline') {
+                favoriteScholarships.sort((a, b) => {
+                    const dateA = new Date(a.deadline);
+                    const dateB = new Date(b.deadline);
+                    return dateA - dateB;
+                });
+            } else if (sortBy === 'amount') {
+                favoriteScholarships.sort((a, b) => {
+                    const amountA = getSortableAmount(a.amount);
+                    const amountB = getSortableAmount(b.amount);
+                    return amountB - amountA; // Sort from high to low
+                });
+            }
+           
+            currentFavoriteResults = favoriteScholarships;
+            favoritesCurrentPage = 1;
+            renderPaginatedFavorites(favoritesCurrentPage);
+            showPage('favorites-page');
+        };
+
+        // Function to show or hide the "View Saved Scholarships" button
+        const updateFavoritesButton = () => {
+            const now = new Date();
+            const hasActiveFavorites = allScholarships.some(s => favoriteIds.has(s.id) && new Date(s.deadline) > now);
+            if (hasActiveFavorites) {
+                viewFavoritesBtn.classList.remove('hidden');
+            } else {
+                viewFavoritesBtn.classList.add('hidden');
+            }
+        };
+
+        // Renders the pagination controls for a given list and container
+        const renderPaginationControls = (totalItems, currentPage, container) => {
+            container.innerHTML = '';
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+           
+            if (totalPages <= 1) {
+                return; // Don't show controls if there's only one page
+            }
+           
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Previous';
+            prevBtn.className = `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`;
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (container === resultsPaginationControls) {
+                    resultsCurrentPage--;
+                    renderPaginatedResults(resultsCurrentPage);
+                } else {
+                    favoritesCurrentPage--;
+                    renderPaginatedFavorites(favoritesCurrentPage);
+                }
+            });
+            container.appendChild(prevBtn);
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${i === currentPage ? 'bg-sky-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`;
+                pageBtn.addEventListener('click', () => {
+                    if (container === resultsPaginationControls) {
+                        resultsCurrentPage = i;
+                        renderPaginatedResults(resultsCurrentPage);
+                    } else {
+                        favoritesCurrentPage = i;
+                        renderPaginatedFavorites(favoritesCurrentPage);
+                    }
+                });
+                container.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next';
+            nextBtn.className = `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`;
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (container === resultsPaginationControls) {
+                    resultsCurrentPage++;
+                    renderPaginatedResults(resultsCurrentPage);
+                } else {
+                    favoritesCurrentPage++;
+                    renderPaginatedFavorites(favoritesCurrentPage);
+                }
+            });
+            container.appendChild(nextBtn);
+        };
+       
+        // --- Event Listeners and Modal Logic ---
+   
+        // Listen for clicks on the main "Find Scholarships" button
+        searchButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            filterAndDisplayScholarships();
+        });
+
+        // Listen for changes in the sort dropdown
+        sortBySelect.addEventListener('change', () => {
+            // Re-run the display logic for the current page to apply the sort
+            if (!resultsPage.classList.contains('hidden')) {
+                filterAndDisplayScholarships();
+            } else if (!favoritesPage.classList.contains('hidden')) {
+                displayFavorites();
+            }
+        });
+
+        // Listen for clicks on the "Back to Search" button from the results page
+        backToSearchBtn.addEventListener('click', () => {
+            showPage('search-page');
+        });
+
+        // Listen for clicks on the "Back to Search" button from the favorites page
+        backFromFavoritesBtn.addEventListener('click', () => {
+            showPage('search-page');
+        });
+
+        // Listen for clicks on the "View Saved Scholarships" button in the header
+        viewFavoritesBtn.addEventListener('click', () => {
+            displayFavorites();
+        });
+
+        // Event listener for the dynamically created favorite buttons (the hearts)
+        document.addEventListener('click', (e) => {
+            const favoriteBtn = e.target.closest('.favorite-btn');
+            if (favoriteBtn) {
+                const scholarshipId = favoriteBtn.dataset.id;
+                if (favoriteIds.has(scholarshipId)) {
+                    favoriteIds.delete(scholarshipId);
+                } else {
+                    favoriteIds.add(scholarshipId);
+                }
+                updateFavoritesButton();
+                // RENDER FIX: Instead of re-filtering, we now just re-render the current page.
+                if (!resultsPage.classList.contains('hidden')) {
+                    renderCurrentResultsPage();
+                } else if (!favoritesPage.classList.contains('hidden')) {
+                    renderCurrentFavoritesPage();
+                }
+            }
+        });
+
+        // Initial setup to load data on page load
+        window.onload = () => {
+            // Before using the scholarships, loop through them and add a unique ID to each one
+            allScholarships = prepopulatedScholarships.map(scholarship => {
+                // Use the spread operator to create a new object and add a new `id` property
+                return { ...scholarship, id: crypto.randomUUID() };
+            });
+            loadingMessage.classList.add('hidden');
+            filterAndDisplayScholarships();
+            updateFavoritesButton(); // Initial check for the favorites button
+        };
+    </script>
+</body>
+</html>
+
+
